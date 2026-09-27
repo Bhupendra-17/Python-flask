@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>People | User Directory</title>
+	<style>
+		:root {
+			color-scheme: light;
+			--ink: #202b27;
+			--muted: #64716b;
+			--line: #d9e1dc;
+			--paper: #f4f7f3;
+			--surface: #ffffff;
+			--green: #176b4b;
+			--green-dark: #10553b;
+			--mint: #dceee4;
+			--coral: #a84234;
+		}
+
+		* { box-sizing: border-box; }
+		body { margin: 0; background: var(--paper); color: var(--ink); font: 15px/1.5 "Segoe UI", sans-serif; }
+		button, input, select { font: inherit; }
+		button { cursor: pointer; }
+		.topbar {
+			min-height: 68px;
+			padding: 0 clamp(20px, 5vw, 72px);
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			background: var(--ink);
+			color: #fff;
+		}
+		.brand { display: flex; align-items: center; gap: 11px; font-weight: 650; }
+		.brand-mark { width: 31px; height: 31px; display: grid; place-items: center; border-radius: 8px; background: #a9dfbf; color: #153b2b; font-weight: 800; }
+		.api-state { color: #b9d9c6; font-size: 13px; }
+		main { max-width: 1240px; margin: 0 auto; padding: 42px 24px 64px; }
+		.page-heading { display: flex; justify-content: space-between; align-items: end; gap: 20px; margin-bottom: 28px; }
+		.eyebrow { margin: 0 0 6px; color: var(--green); font-size: 12px; font-weight: 750; text-transform: uppercase; }
+		h1, h2, p { margin-top: 0; }
+		h1 { margin-bottom: 5px; font: 36px/1.12 Georgia, serif; letter-spacing: 0; }
+		.subtitle { margin: 0; color: var(--muted); }
+		.workspace { display: grid; grid-template-columns: minmax(260px, 330px) minmax(0, 1fr); align-items: start; gap: 30px; }
+		.create-panel { padding: 22px; border: 1px solid var(--line); border-top: 4px solid var(--green); background: var(--surface); }
+		h2 { margin-bottom: 17px; font-size: 18px; }
+		label { display: block; margin: 15px 0 6px; font-size: 13px; font-weight: 650; }
+		input, select { width: 100%; min-height: 42px; padding: 9px 11px; border: 1px solid #bdc9c1; border-radius: 4px; background: #fff; color: var(--ink); }
+		input:focus, select:focus { outline: 3px solid #b5dfc5; border-color: var(--green); }
+		.primary-button { width: 100%; min-height: 43px; margin-top: 19px; border: 0; border-radius: 4px; background: var(--green); color: #fff; font-weight: 700; }
+		.primary-button:hover { background: var(--green-dark); }
+		.notice { min-height: 23px; margin: 10px 0 0; color: var(--muted); font-size: 13px; }
+		.notice.error { color: var(--coral); }
+		.notice.success { color: var(--green); }
+		.directory { min-width: 0; }
+		.directory-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 15px; }
+		.directory-heading h2 { margin: 0; }
+		.total { color: var(--muted); font-size: 13px; white-space: nowrap; }
+		.tools { display: flex; gap: 9px; margin-bottom: 12px; }
+		.tools input { flex: 1; }
+		.tools select { width: 104px; }
+		.table-wrap { overflow-x: auto; border: 1px solid var(--line); background: var(--surface); }
+		table { width: 100%; border-collapse: collapse; text-align: left; }
+		th, td { padding: 13px 15px; border-bottom: 1px solid #e6ebe7; }
+		th { background: #e8f0eb; color: #40564a; font-size: 12px; text-transform: uppercase; }
+		tbody tr:last-child td { border-bottom: 0; }
+		.person-name { font-weight: 650; }
+		.role-tag { display: inline-block; padding: 3px 8px; border-radius: 3px; background: var(--mint); color: #24543a; font-size: 12px; }
+		.view-button { padding: 5px 9px; border: 1px solid #b8c8bd; border-radius: 4px; background: white; color: var(--green-dark); font-size: 13px; font-weight: 650; }
+		.view-button:hover { background: var(--mint); }
+		.empty { padding: 34px 15px; color: var(--muted); text-align: center; }
+		.table-footer { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding-top: 13px; }
+		.page-label { color: var(--muted); font-size: 13px; }
+		.page-actions { display: flex; gap: 7px; }
+		.page-actions button { min-width: 76px; min-height: 34px; border: 1px solid #bdc9c1; border-radius: 4px; background: #fff; color: var(--ink); }
+		.page-actions button:disabled { cursor: default; opacity: .45; }
+		.visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+		@media (max-width: 760px) {
+			main { padding: 30px 17px 48px; }
+			.workspace { grid-template-columns: 1fr; gap: 28px; }
+			.page-heading { align-items: start; flex-direction: column; }
+			h1 { font-size: 32px; }
+		}
+		@media (max-width: 520px) {
+			.topbar { padding: 0 17px; }
+			.api-state { font-size: 12px; }
+			.directory-heading { align-items: start; flex-direction: column; gap: 4px; }
+			.tools { flex-wrap: wrap; }
+			.tools input { flex-basis: 100%; }
+			.tools select { flex: 1; width: auto; }
+			th, td { padding: 11px 9px; }
+			th { font-size: 11px; }
+			.email-cell { overflow-wrap: anywhere; }
+		}
+	</style>
+</head>
+<body>
+	<header class="topbar">
+		<div class="brand"><span class="brand-mark" aria-hidden="true">P</span><span>People Directory</span></div>
+		<span class="api-state" id="api-state" role="status">Connecting to API...</span>
+	</header>
+	<main>
+		<section class="page-heading" aria-labelledby="page-title">
+			<div>
+				<p class="eyebrow">User management</p>
+				<h1 id="page-title">People</h1>
+				<p class="subtitle">Create, search, and review the people in your directory.</p>
+			</div>
+		</section>
+		<div class="workspace">
+			<section class="create-panel" aria-labelledby="create-title">
+				<h2 id="create-title">Add a person</h2>
+				<form id="user-form">
+					<label for="name">Full name</label>
+					<input id="name" name="name" autocomplete="name" maxlength="120" required>
+					<label for="email">Email address</label>
+					<input id="email" name="email" type="email" autocomplete="email" maxlength="255" required>
+					<label for="role">Role</label>
+					<input id="role" name="role" maxlength="80" placeholder="e.g. Engineer" required>
+					<button class="primary-button" type="submit">Create user</button>
+					<p class="notice" id="form-message" aria-live="polite"></p>
+				</form>
+			</section>
+			<section class="directory" aria-labelledby="directory-title">
+				<div class="directory-heading">
+					<h2 id="directory-title">Directory</h2>
+					<span class="total" id="total-count">Loading users...</span>
+				</div>
+				<div class="tools">
+					<input id="search" type="search" placeholder="Search by name or email" aria-label="Search users">
+					<select id="page-size" aria-label="Users per page">
+						<option value="5">5 per page</option>
+						<option value="10" selected>10 per page</option>
+						<option value="25">25 per page</option>
+					</select>
+				</div>
+				<div class="table-wrap">
+					<table>
+						<thead><tr><th>Name</th><th>Email</th><th>Role</th><th><span class="visually-hidden">Details</span></th></tr></thead>
+						<tbody id="users-body"><tr><td class="empty" colspan="4">Loading users...</td></tr></tbody>
+					</table>
+				</div>
+				<div class="table-footer">
+					<span class="page-label" id="page-label"></span>
+					<div class="page-actions">
+						<button id="previous-page" type="button">Previous</button>
+						<button id="next-page" type="button">Next</button>
+					</div>
+				</div>
+				<p class="notice" id="directory-message" role="status"></p>
+			</section>
+		</div>
+	</main>
+	<script>
+		const form = document.querySelector("#user-form");
+		const formMessage = document.querySelector("#form-message");
+		const directoryMessage = document.querySelector("#directory-message");
+		const usersBody = document.querySelector("#users-body");
+		const searchInput = document.querySelector("#search");
+		const pageSize = document.querySelector("#page-size");
+		const previousButton = document.querySelector("#previous-page");
+		const nextButton = document.querySelector("#next-page");
+		let currentPage = 1;
+		let searchTimer;
+
+		function showMessage(element, message, kind = "") {
+			element.textContent = message;
+			element.className = `notice ${kind}`;
+		}
+
+		function escapeHtml(value) {
+			return String(value).replace(/[&<>"']/g, (character) => ({
+				"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
+			})[character]);
+		}
+
+		async function requestJson(url, options) {
+			const response = await fetch(url, options);
+			const result = await response.json();
+			if (!response.ok) throw new Error(result.error || "Request failed");
+			return result;
+		}
+
+		async function loadUsers() {
+			const limit = Number(pageSize.value);
+			const params = new URLSearchParams({ page: String(currentPage), limit: String(limit), search: searchInput.value.trim() });
+			usersBody.innerHTML = '<tr><td class="empty" colspan="4">Loading users...</td></tr>';
+			try {
+				const result = await requestJson(`/users?${params}`);
+				document.querySelector("#total-count").textContent = `${result.total} ${result.total === 1 ? "person" : "people"}`;
+				document.querySelector("#api-state").textContent = "API connected";
+				document.querySelector("#page-label").textContent = result.total
+					? `Page ${currentPage} of ${Math.max(1, Math.ceil(result.total / limit))}`
+					: "No results";
+				previousButton.disabled = currentPage <= 1;
+				nextButton.disabled = currentPage * limit >= result.total;
+				usersBody.innerHTML = result.data.length ? result.data.map((user) => `
+					<tr>
+						<td class="person-name">${escapeHtml(user.name)}</td>
+						<td class="email-cell">${escapeHtml(user.email)}</td>
+						<td><span class="role-tag">${escapeHtml(user.role)}</span></td>
+						<td><button class="view-button" type="button" data-user-id="${user.id}" aria-label="View user ${escapeHtml(user.name)}">View</button></td>
+					</tr>`).join("") : '<tr><td class="empty" colspan="4">No users found. Try another search or add someone.</td></tr>';
+				showMessage(directoryMessage, "");
+			} catch (error) {
+				document.querySelector("#api-state").textContent = "API unavailable";
+				document.querySelector("#total-count").textContent = "Could not load users";
+				usersBody.innerHTML = '<tr><td class="empty" colspan="4">Could not connect to the API.</td></tr>';
+				showMessage(directoryMessage, error.message, "error");
+			}
+		}
+
+		form.addEventListener("submit", async (event) => {
+			event.preventDefault();
+			const data = Object.fromEntries(new FormData(form));
+			try {
+				await requestJson("/users", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify(data)
+				});
+				form.reset();
+				currentPage = 1;
+				showMessage(formMessage, "User created successfully.", "success");
+				await loadUsers();
+			} catch (error) {
+				showMessage(formMessage, error.message, "error");
+			}
+		});
+		searchInput.addEventListener("input", () => {
+			window.clearTimeout(searchTimer);
+			searchTimer = window.setTimeout(() => { currentPage = 1; loadUsers(); }, 250);
+		});
+		pageSize.addEventListener("change", () => { currentPage = 1; loadUsers(); });
+		previousButton.addEventListener("click", () => { currentPage -= 1; loadUsers(); });
+		nextButton.addEventListener("click", () => { currentPage += 1; loadUsers(); });
+		usersBody.addEventListener("click", async (event) => {
+			const button = event.target.closest("[data-user-id]");
+			if (!button) return;
+			try {
+				const { data: user } = await requestJson(`/users/${button.dataset.userId}`);
+				showMessage(directoryMessage, `User #${user.id}: ${user.name} · ${user.email} · ${user.role}`);
+			} catch (error) {
+				showMessage(directoryMessage, error.message, "error");
+			}
+		});
+		loadUsers();
+	</script>
+</body>
+</html>
